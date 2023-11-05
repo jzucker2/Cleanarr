@@ -1,13 +1,22 @@
 name: Deploy to Dockerhub
+
 on:
+  schedule:
+    # * is a special character in YAML so you have to quote this string
+    # every Sunday at UTC midnight
+    - cron: '0 0 * * 0'
   push:
-    tags:
-      - v*
+    branches: [ master ]
+    # Publish semver tags as releases.
+    tags: [ 'v*' ]
+  pull_request:
+    branches: [ master ]
+
 jobs:
   deploy:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
         name: Check out code
       - uses: mr-smithers-excellent/docker-build-push@v5
         name: Build & push Docker image
@@ -18,4 +27,3 @@ jobs:
           dockerfile: Dockerfile
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
-
